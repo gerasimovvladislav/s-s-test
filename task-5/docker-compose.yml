@@ -1,0 +1,75 @@
+version: '3.2'
+
+networks:
+  task-5:
+    driver: bridge
+
+services:
+  frontend:
+    build: frontend
+    ports:
+      - 20080:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+    links:
+      - mysql
+    networks:
+      - task-5
+
+  backend:
+    build: backend
+    ports:
+      - 21080:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+    links:
+      - mysql
+    networks:
+      - task-5
+
+  api:
+    build: api
+    ports:
+      - 22080:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+    links:
+      - mysql
+    networks:
+      - task-5
+
+  composer:
+    image: composer/composer
+    command: install
+    volumes:
+      - ./:/app
+    networks:
+      - task-5
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=verysecret
+      - MYSQL_DATABASE=yii2advanced
+      - MYSQL_USER=yii2advanced
+      - MYSQL_PASSWORD=secret
+    networks:
+      - task-5
+
+  adminer:
+    image: adminer
+    depends_on:
+      - mysql
+    ports:
+      - 8080:8080
+    networks:
+      - task-5
