@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace app\entities\user;
+namespace app\entities\user\fields;
 
 /**
  * Идентификатор пользователя.
